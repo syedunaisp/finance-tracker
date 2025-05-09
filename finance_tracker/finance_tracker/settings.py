@@ -75,6 +75,7 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = 'finance_tracker.wsgi.application'
 
 

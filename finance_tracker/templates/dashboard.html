@@ -1,3 +1,87 @@
 {% extends "layout.html" %}
 
-{% block content %}<h1>This is my Dashboard</h1>{% endblock %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finance Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <div class="min-h-screen flex">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-md">
+      <div class="p-6 font-bold text-xl text-indigo-600">
+        💰 Finance Tracker
+      </div>
+      <nav class="p-4 space-y-2">
+        <a href="#" class="block p-2 rounded hover:bg-indigo-100">Dashboard</a>
+        <a href="#" class="block p-2 rounded hover:bg-indigo-100">Transactions</a>
+        <a href="#" class="block p-2 rounded hover:bg-indigo-100">Reports</a>
+        <a href="#" class="block p-2 rounded hover:bg-indigo-100">Settings</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6">
+      <!-- Header -->
+      <header class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-semibold">Dashboard</h1>
+        <button class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Add Transaction</button>
+      </header>
+
+      <!-- Summary Cards -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <div class="bg-white p-4 rounded-lg shadow">
+          <h2 class="text-gray-500 text-sm">Balance</h2>
+          <p class="text-2xl font-bold text-indigo-600">$12,450.00</p>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow">
+          <h2 class="text-gray-500 text-sm">Income</h2>
+          <p class="text-2xl font-bold text-green-500">$5,000.00</p>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow">
+          <h2 class="text-gray-500 text-sm">Expenses</h2>
+          <p class="text-2xl font-bold text-red-500">$2,300.00</p>
+        </div>
+      </section>
+
+      <!-- Transactions Table -->
+      <section class="bg-white rounded-lg shadow p-4">
+        <h2 class="text-lg font-semibold mb-4">Recent Transactions</h2>
+        <table class="w-full text-sm">
+          <thead class="text-left text-gray-500">
+            <tr>
+              <th class="pb-2">Date</th>
+              <th class="pb-2">Description</th>
+              <th class="pb-2">Amount</th>
+              <th class="pb-2">Type</th>
+            </tr>
+          </thead>
+          <tbody class="text-gray-700">
+            <tr class="border-t">
+              <td class="py-2">2025-05-09</td>
+              <td class="py-2">Salary</td>
+              <td class="py-2 text-green-500">+ $3000</td>
+              <td class="py-2">Income</td>
+            </tr>
+            <tr class="border-t">
+              <td class="py-2">2025-05-08</td>
+              <td class="py-2">Groceries</td>
+              <td class="py-2 text-red-500">- $150</td>
+              <td class="py-2">Expense</td>
+            </tr>
+            <!-- Add dynamic entries here -->
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
+
+
+{% endblock %}
