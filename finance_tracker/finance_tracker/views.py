@@ -14,7 +14,7 @@ def transaction_add(request):
 
 @login_required
 def transaction_view(request):
-    return HttpResponse("Hello")
+    return render(request, 'transaction_view.html')
 
 
 def signup_view(request):
