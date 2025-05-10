@@ -45,7 +45,7 @@ INSTALLED_APPS = [
 TAILWIND_APP_NAME = 'theme'
 INTERNAL_IPS = ['127.0.0.1']
 
-NPM_BIN_PATH = r"C:\Program Files\NPM\bin"
+NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -134,3 +134,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard'  # where to go after login
 LOGOUT_REDIRECT_URL = 'login'
+
+
