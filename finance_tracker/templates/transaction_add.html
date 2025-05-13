@@ -1,44 +1,352 @@
-{% extends "layout.html" %}
+{% extends 'layout.html' %}
+
+{% block title %}Add Transaction - Finance Tracker{% endblock %}
 
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Add Transaction</title>
-  <link href="https://cdn.tailwindcss.com" rel="stylesheet">
-</head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-6">
-  <div class="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
-    <h2 class="text-2xl font-semibold mb-6 text-center">Add Transaction</h2>
-    <form method="POST">
-      {% csrf_token %}
-      <div class="mb-4">
-        <label class="block text-gray-700">Amount</label>
-        <input type="number" name="amount" class="w-full mt-1 px-3 py-2 border rounded-lg" required>
-      </div>
-      <div class="mb-4">
-        <label class="block text-gray-700">Category</label>
-        <input type="text" name="category" class="w-full mt-1 px-3 py-2 border rounded-lg" required>
-      </div>
-      <div class="mb-4">
-        <label class="block text-gray-700">Type</label>
-        <select name="type" class="w-full mt-1 px-3 py-2 border rounded-lg">
-          <option value="income">Income</option>
-          <option value="expense">Expense</option>
-        </select>
-      </div>
-      <div class="mb-4">
-        <label class="block text-gray-700">Date</label>
-        <input type="date" name="date" class="w-full mt-1 px-3 py-2 border rounded-lg" required>
-      </div>
-      <div class="text-center">
-        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
-          Add
-        </button>
-      </div>
-    </form>
-  </div>
-</body>
-</html>
+<div class="container mx-auto max-w-3xl">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">Add Transaction</h1>
+        <p class="text-gray-600">Enter the details of your transaction below.</p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+        <form id="transaction-form" method="post" action="{% url 'transaction_add' %}" class="space-y-6" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            <p>Form Action URL: {% url 'transaction_add' %}</p>
+            {% if form.errors %}
+            <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-red-700">
+                            Please correct the errors below.
+                        </p>
+                        <ul class="list-disc pl-5 space-y-1 text-sm text-red-700">
+                            {% for field in form %}
+                                {% if field.errors %}
+                                    {% for error in field.errors %}
+                                        <li>{{ field.label }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Transaction Type -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Transaction Type</label>
+                <div class="flex space-x-4">
+                    <div class="flex items-center">
+                        <input id="expense" name="transaction_type" type="radio" value="expense" checked class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                        <label for="expense" class="ml-2 block text-sm text-gray-700">Expense</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input id="income" name="transaction_type" type="radio" value="income" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                        <label for="income" class="ml-2 block text-sm text-gray-700">Income</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input id="transfer" name="transaction_type" type="radio" value="transfer" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                        <label for="transfer" class="ml-2 block text-sm text-gray-700">Transfer</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Amount -->
+                <div>
+                    <label for="amount" class="block text-sm font-medium text-gray-700 mb-2">Amount</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="text-gray-500 sm:text-sm">$</span>
+                        </div>
+                        <input type="number" name="amount" id="amount" step="0.01" required
+                            class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
+                            placeholder="0.00">
+                    </div>
+                </div>
+
+                <!-- Date -->
+                <div>
+                    <label for="date" class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                    <input type="date" name="date" id="date" required
+                        class="focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div>
+                <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <input type="text" name="description" id="description" required
+                    class="focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    placeholder="e.g., Grocery Shopping, Salary, Rent Payment">
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Category -->
+                <div id="category_section">
+                    <label for="category" class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                    <select id="category" name="category" required
+                        class="focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                        <option value="" disabled selected>Select a category</option>
+                        <optgroup label="Expenses">
+                            <option value="housing">Housing</option>
+                            <option value="food">Food</option>
+                            <option value="transport">Transport</option>
+                            <option value="utilities">Utilities</option>
+                            <option value="entertainment">Entertainment</option>
+                            <option value="health">Health</option>
+                            <option value="education">Education</option>
+                            <option value="shopping">Shopping</option>
+                            <option value="personal">Personal</option>
+                            <option value="other_expense">Other</option>
+                        </optgroup>
+                        <optgroup label="Income">
+                            <option value="salary">Salary</option>
+                            <option value="business">Business</option>
+                            <option value="investments">Investments</option>
+                            <option value="gifts">Gifts</option>
+                            <option value="other_income">Other</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <!-- Account -->
+                <div>
+                    <label for="account" class="block text-sm font-medium text-gray-700 mb-2">Account</label>
+                    <select id="account" name="account" required
+                        class="focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                        <option value="" disabled selected>Select an account</option>
+                        <option value="checking">Checking Account</option>
+                        <option value="savings">Savings Account</option>
+                        <option value="credit_card">Credit Card</option>
+                        <option value="cash">Cash</option>
+                        <option value="investment">Investment Account</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Transfer To Account (shown only for transfers) -->
+            <div id="transfer_account_section" class="hidden">
+                <label for="transfer_to_account" class="block text-sm font-medium text-gray-700 mb-2">Transfer To</label>
+                <select id="transfer_to_account" name="transfer_to_account"
+                    class="focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                    <option value="" disabled selected>Select an account</option>
+                    <option value="checking">Checking Account</option>
+                    <option value="savings">Savings Account</option>
+                    <option value="credit_card">Credit Card</option>
+                    <option value="cash">Cash</option>
+                    <option value="investment">Investment Account</option>
+                </select>
+            </div>
+
+            <!-- Attachment (Optional) -->
+            <div>
+                <label for="attachment" class="block text-sm font-medium text-gray-700 mb-2">Attachment (Optional)</label>
+                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                    <div class="space-y-1 text-center">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <div class="flex text-sm text-gray-600">
+                            <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                                <span>Upload a file</span>
+                                <input id="file-upload" name="file-upload" type="file" class="sr-only">
+                            </label>
+                            <p class="pl-1">or drag and drop</p>
+                        </div>
+                        <p class="text-xs text-gray-500">PNG, JPG, PDF up to 10MB</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div>
+                <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
+                <textarea id="notes" name="notes" rows="3"
+                    class="focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                    placeholder="Add any additional details about this transaction..."></textarea>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="flex justify-between pt-4">
+                <a href="{% url 'transaction_view' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Cancel
+                </a>
+                <div class="flex space-x-3">
+                    <button id="save-button" type="submit" name="action" value="save" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Save
+                    </button>
+                    <button id="save-add-another-button" type="submit" name="action" value="save_add_another" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        Save & Add Another
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("JavaScript is running!");
+        const transactionForm = document.getElementById('transaction-form');
+        const expenseRadio = document.getElementById('expense');
+        const incomeRadio = document.getElementById('income');
+        const transferRadio = document.getElementById('transfer');
+        const categorySection = document.getElementById('category_section');
+        const transferAccountSection = document.getElementById('transfer_account_section');
+        const categorySelect = document.getElementById('category');
+        const accountSelect = document.getElementById('account');
+        const transferToAccountSelect = document.getElementById('transfer_to_account');
+        const saveButton = document.getElementById('save-button');
+        saveButton.addEventListener('click', function(event) {
+            console.log("Submit button clicked");
+        });
+        const saveAddAnotherButton = document.getElementById('save-add-another-button');
+        
+        // Function to update form based on transaction type
+        function updateFormFields() {
+            if (transferRadio.checked) {
+                // For transfers, show transfer account field and hide categories
+                categorySection.classList.add('hidden');
+                transferAccountSection.classList.remove('hidden');
+                categorySelect.removeAttribute('required');
+                transferToAccountSelect.setAttribute('required', '');
+            } else {
+                // For expenses and income, show categories and hide transfer account
+                categorySection.classList.remove('hidden');
+                transferAccountSection.classList.add('hidden');
+                categorySelect.setAttribute('required', '');
+                transferToAccountSelect.removeAttribute('required');
+                
+                // Update category options based on transaction type
+                const expenseOptions = categorySelect.querySelector('optgroup[label="Expenses"]');
+                const incomeOptions = categorySelect.querySelector('optgroup[label="Income"]');
+                
+                if (expenseRadio.checked) {
+                    expenseOptions.classList.remove('hidden');
+                    incomeOptions.classList.add('hidden');
+                    // Set default category for expense if none selected
+                    if (!categorySelect.value) {
+                        const firstExpenseOption = expenseOptions.querySelector('option');
+                        if (firstExpenseOption) categorySelect.value = firstExpenseOption.value;
+                    }
+                } else if (incomeRadio.checked) {
+                    expenseOptions.classList.add('hidden');
+                    incomeOptions.classList.remove('hidden');
+                    // Set default category for income if none selected
+                    if (!categorySelect.value) {
+                        const firstIncomeOption = incomeOptions.querySelector('option');
+                        if (firstIncomeOption) categorySelect.value = firstIncomeOption.value;
+                    }
+                }
+            }
+        }
+        
+        // Add event listeners to radio buttons
+        expenseRadio.addEventListener('change', updateFormFields);
+        incomeRadio.addEventListener('change', updateFormFields);
+        transferRadio.addEventListener('change', updateFormFields);
+        
+        // Prevent selecting the same account for both source and destination in transfers
+        accountSelect.addEventListener('change', function() {
+            const selectedAccount = this.value;
+            
+            // Disable the selected account in the transfer to dropdown
+            Array.from(transferToAccountSelect.options).forEach(option => {
+                if (option.value === selectedAccount) {
+                    option.disabled = true;
+                } else if (option.value !== '') {
+                    option.disabled = false;
+                }
+            });
+        });
+        
+        transactionForm.addEventListener('submit', function(event) {
+        event.preventDefault(); // ✅ Always stop default first
+        console.log("Form submit triggered");
+
+        let isValid = true;
+
+        const amountInput = document.getElementById('amount');
+
+        // Validate amount
+        if (!amountInput.value || parseFloat(amountInput.value) <= 0) {
+            isValid = false;
+            console.log('❌ Invalid amount');
+            } else {
+            console.log('✅ Valid amount');
+        }
+
+        // Validate account selection
+        if (!accountSelect.value) {
+            isValid = false;
+            console.log('❌ No account selected');
+        } else {
+            console.log('✅ Account selected');
+        }
+
+        // Validate transfer account if transfer is selected
+        if (transferRadio.checked) {
+            if (!transferToAccountSelect.value) {
+                isValid = false;
+                console.log('❌ No destination transfer account selected');
+            } else {
+                console.log('✅ Transfer account selected');
+            }
+        }
+
+        // Validate category if not a transfer
+        if (!transferRadio.checked) {
+            if (!categorySelect.value) {
+                isValid = false;
+                console.log('❌ No category selected');
+            } else {
+                console.log('✅ Category selected');
+            }
+        }
+
+        if (!isValid) {
+            console.log('❌ Form blocked due to errors');
+        } else {
+            console.log('✅ All validations passed. Letting form submit naturally...');
+            // Do nothing — allow default submit
+        }
+    });
+
+
+        
+        // Initialize form state
+        updateFormFields();
+        
+        // Initialize date field with today's date
+        const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0];
+        document.getElementById('date').value = formattedDate;
+        
+        // Make sure file upload works properly
+        const fileUpload = document.getElementById('file-upload');
+        const fileLabel = fileUpload.parentNode.querySelector('span');
+        
+        fileUpload.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                fileLabel.textContent = `Selected: ${this.files[0].name}`;
+            } else {
+                fileLabel.textContent = 'Upload a file';
+            }
+        });
+    });
+</script>
 {% endblock %}
